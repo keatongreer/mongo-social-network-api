@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { Thought, User } from "../models/index.js";
 import { Request, Response } from "express";
 
@@ -53,12 +52,10 @@ export const createThought = async (req: Request, res: Response) => {
     return res.json({ thought, user: updatedUser });
   } catch (err) {
     console.error("Error creating thought:", err);
-    return res
-      .status(500)
-      .json({
-        message: "An error occurred while creating the thought.",
-        error: err,
-      });
+    return res.status(500).json({
+      message: "An error occurred while creating the thought.",
+      error: err,
+    });
   }
 };
 // delete a thought

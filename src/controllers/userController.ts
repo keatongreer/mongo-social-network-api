@@ -1,5 +1,4 @@
-import { ObjectId } from "mongodb";
-import { User, Thought } from "../models/index.js";
+import { User } from "../models/index.js";
 import { Request, Response } from "express";
 
 // get all users
