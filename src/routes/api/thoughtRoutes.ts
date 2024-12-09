@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 // /api/thoughts
-router.route("/").get(getAllThoughts).post(createThought);
+router.route("/").get(getAllThoughts).post(createThought); // post requires userId in the req body
 
 // /api/thoughts/:thoughtId
 router
@@ -17,5 +17,8 @@ router
   .get(getSingleThought)
   .put(updateThought)
   .delete(deleteThought);
+
+// /api/thoughts/:thoughtId/reactions
+router.route("/:thoughtId/reactions").post().delete();
 
 export { router as thoughtRouter };

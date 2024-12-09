@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { Thought } from "../models/index.js";
+import { Thought, User } from "../models/index.js";
 import { Request, Response } from "express";
 
 // get all thoughts
@@ -33,16 +33,34 @@ export const getSingleThought = async (req: Request, res: Response) => {
   }
 };
 
-// create a new thought
+// create a new thought and add its id to the associated user
 export const createThought = async (req: Request, res: Response) => {
   try {
     const thought = await Thought.create(req.body);
-    res.json(thought);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.body.userId,
+      { $push: { thoughts: thought._id } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ message: "User not found to associate the thought." });
+    }
+
+    return res.json({ thought, user: updatedUser });
   } catch (err) {
-    res.status(500).json(err);
+    console.error("Error creating thought:", err);
+    return res
+      .status(500)
+      .json({
+        message: "An error occurred while creating the thought.",
+        error: err,
+      });
   }
 };
-
 // delete a thought
 export const deleteThought = async (req: Request, res: Response) => {
   try {
@@ -88,6 +106,57 @@ export const updateThought = async (req: Request, res: Response) => {
     console.error("Error updating thought:", error);
     return res.status(500).json({
       message: "An error occurred while updating the thought.",
+      error,
+    });
+  }
+};
+
+// create a reaction
+export const createReaction = async (req: Request, res: Response) => {
+  const { thoughtId } = req.params;
+  const reaction = req.body;
+
+  try {
+    const updatedThought = await Thought.findByIdAndUpdate(
+      thoughtId,
+      { $push: { reactions: reaction } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedThought) {
+      return res.status(404).json({ message: "Thought not found." });
+    }
+
+    return res.status(200).json(updatedThought);
+  } catch (error) {
+    console.error("Error adding reaction:", error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while adding the reaction.", error });
+  }
+};
+
+// delete a reaction
+export const removeReaction = async (req: Request, res: Response) => {
+  const { thoughtId } = req.params;
+  const { reactionId } = req.body;
+
+  try {
+    const updatedThought = await Thought.findByIdAndUpdate(
+      thoughtId,
+      { $pull: { reactions: { reactionId } } },
+      { new: true }
+    );
+
+    if (!updatedThought) {
+      return res.status(404).json({ message: "Thought not found." });
+    }
+
+    return res.status(200).json(updatedThought);
+  } catch (error) {
+    console.error("Error removing reaction:", error);
+    return res.status(500).json({
+      message: "An error occurred while removing the reaction.",
       error,
     });
   }
