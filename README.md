@@ -17,7 +17,7 @@ This project is covered under the following license: MIT License
 This project was tested using Visual Studio Code, Node.js, MongoDB, and Insomnia
 
 ## Video
-[Click here to watch a video walkthrough of this project](https://youtu.be/)
+[Click here to watch a video walkthrough of this project](https://youtu.be/fPTxjG2iOqI)
 
 ## Questions
 Github: keatongreer
