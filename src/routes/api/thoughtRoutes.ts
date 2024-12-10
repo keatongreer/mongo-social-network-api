@@ -5,11 +5,13 @@ import {
   createThought,
   deleteThought,
   updateThought,
-} from "../../controllers/thoughtController";
+  createReaction,
+  deleteReaction,
+} from "../../controllers/thoughtController.js";
 const router = Router();
 
 // /api/thoughts
-router.route("/").get(getAllThoughts).post(createThought); // post requires userId in the req body
+router.route("/").get(getAllThoughts).post(createThought); // post requires username in the req body
 
 // /api/thoughts/:thoughtId
 router
@@ -19,6 +21,9 @@ router
   .delete(deleteThought);
 
 // /api/thoughts/:thoughtId/reactions
-router.route("/:thoughtId/reactions").post().delete();
+router.route("/:thoughtId/reactions").post(createReaction);
+
+// /api/thoughts/:thoughtId/reactions/:reactionId
+router.delete("/:thoughtId/reactions/:reactionId", deleteReaction);
 
 export { router as thoughtRouter };

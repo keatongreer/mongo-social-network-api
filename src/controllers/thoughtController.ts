@@ -37,8 +37,8 @@ export const createThought = async (req: Request, res: Response) => {
   try {
     const thought = await Thought.create(req.body);
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.body.userId,
+    const updatedUser = await User.findOneAndUpdate(
+      { username: req.body.username },
       { $push: { thoughts: thought._id } },
       { new: true }
     );
@@ -127,29 +127,34 @@ export const createReaction = async (req: Request, res: Response) => {
     return res.status(200).json(updatedThought);
   } catch (error) {
     console.error("Error adding reaction:", error);
-    return res
-      .status(500)
-      .json({ message: "An error occurred while adding the reaction.", error });
+    return res.status(500).json({
+      message: "An error occurred while adding the reaction.",
+      error,
+    });
   }
 };
 
 // delete a reaction
-export const removeReaction = async (req: Request, res: Response) => {
+export const deleteReaction = async (req: Request, res: Response) => {
   const { thoughtId } = req.params;
   const { reactionId } = req.body;
 
   try {
-    const updatedThought = await Thought.findByIdAndUpdate(
-      thoughtId,
-      { $pull: { reactions: { reactionId } } },
-      { new: true }
-    );
+    const thought = await Thought.findById(thoughtId);
 
-    if (!updatedThought) {
+    if (!thought) {
       return res.status(404).json({ message: "Thought not found." });
     }
 
-    return res.status(200).json(updatedThought);
+    thought.reactions = thought.reactions.filter(
+      (reaction: any) => reaction.reactionId.toString() !== reactionId
+    );
+
+    await thought.save();
+
+    return res
+      .status(200)
+      .json({ message: "Reaction removed successfully.", thought });
   } catch (error) {
     console.error("Error removing reaction:", error);
     return res.status(500).json({
