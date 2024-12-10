@@ -136,20 +136,23 @@ export const createReaction = async (req: Request, res: Response) => {
 
 // delete a reaction
 export const deleteReaction = async (req: Request, res: Response) => {
-  const { thoughtId } = req.params;
-  const { reactionId } = req.body;
+  const { thoughtId, reactionId } = req.params;
 
   try {
+    // Find the thought by its ID
     const thought = await Thought.findById(thoughtId);
 
     if (!thought) {
       return res.status(404).json({ message: "Thought not found." });
     }
 
+    // Filter out the reaction by its reactionId
     thought.reactions = thought.reactions.filter(
-      (reaction: any) => reaction.reactionId.toString() !== reactionId
+      (reaction: any) =>
+        reaction.reactionId && reaction.reactionId.toString() !== reactionId
     );
 
+    // Save the updated thought
     await thought.save();
 
     return res

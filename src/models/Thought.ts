@@ -17,10 +17,6 @@ interface IThought extends Document {
 
 const reactionSchema = new Schema<IReaction>(
   {
-    reactionId: {
-      type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId(),
-    },
     reactionBody: {
       type: String,
       required: true,
